@@ -27,4 +27,4 @@ app.use("/users", usersRouter);
 const accomplishmentsRouter = require("./routes/accomplishments");
 app.use("/accomplishments", accomplishmentsRouter);
 
-app.listen(3000, () => console.log("Server started"));
+app.listen(process.env.PORT, () => console.log("Server started"));
