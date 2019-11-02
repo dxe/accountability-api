@@ -16,9 +16,7 @@ db.once("open", () => console.log("Connected to database"));
 
 app.use(express.json());
 app.use(
-  cors({
-    origin: "*" // allow requests from react app in dev
-  })
+  cors()
 );
 
 const usersRouter = require("./routes/users");
