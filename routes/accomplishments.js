@@ -188,7 +188,7 @@ router.get("/dashboard", async (req, res) => {
             //console.log(user.id)
             //console.log(accomplishment.text.length)
             if (
-              moment(accomplishment.date).format('YYYY-MM-DD') === day.date
+              moment.utc(accomplishment.date).format('YYYY-MM-DD') === day.date
               && accomplishment.user.toString() == user.id.toString()
               && accomplishment.text.length > 2
             ) {
