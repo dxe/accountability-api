@@ -17,7 +17,7 @@ db.once("open", () => console.log("Connected to database"));
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://localhost:3001" // allow requests from react app in dev
+    origin: "*" // allow requests from react app in dev
   })
 );
 
