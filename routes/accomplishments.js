@@ -147,7 +147,7 @@ router.get("/dashboard", async (req, res) => {
 
   // get list of all users
   try {
-    const users = await User.find().sort({username: 1});
+    const users = await User.find().sort({firstName: 1});
 
     let usersArr = [];
 
