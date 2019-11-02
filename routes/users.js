@@ -12,13 +12,14 @@ let jwt = require("jsonwebtoken");
 // get all users
 router.get("/", middleware.checkToken, async (req, res) => {
   try {
-    const users = await User.find();
+    const users = await User.find().sort({firstName: 1});
     const currentUser = req.decoded.userId;
     const currentUserFirstName = req.decoded.firstName;
     res.json({
       currentUser: { id: currentUser, firstName: currentUserFirstName },
       users: users
     });
+
   } catch (err) {
     // 500: internal server error
     res.status(500).json({ message: err.message });

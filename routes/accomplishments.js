@@ -140,9 +140,14 @@ router.get("/dashboard", async (req, res) => {
     findFilter.date.$gte = new Date(req.query.start_date);
   if (req.query.end_date) findFilter.date.$lte = new Date(req.query.end_date);
 
+  // get all accomplishments from the date range
+  const accomplishments = await Accomplishment.find(findFilter);
+
+  //console.log(accomplishments)
+
   // get list of all users
   try {
-    const users = await User.find();
+    const users = await User.find().sort({username: 1});
 
     let usersArr = [];
 
@@ -169,16 +174,40 @@ router.get("/dashboard", async (req, res) => {
       if (user.id != "headers") {
         // loop through each day
         await asyncForEach(user.data, async (day, dayIndex) => {
-          // see if text exists in the database for this user for this day
-          let accomplishment = await Accomplishment.findOne({
-            user: user.id,
-            date: day.date
-          });
 
-          if (accomplishment !== null && accomplishment.text.length > 2) {
-            // set text to true
-            usersArr[userIndex].data[dayIndex].text = true;
-          }
+          // for each item in accomplishments
+          // if accomplishment.date = day.date 
+          // AND accomplishment.user = user.id
+          // AND accomplishment.text.length > 2
+          // then set to true
+
+          await asyncForEach(accomplishments, async (accomplishment) => {
+            //console.log(moment(accomplishment.date).format('YYYY-MM-DD'))
+            //console.log(day.date)
+            //console.log(accomplishment.user)
+            //console.log(user.id)
+            //console.log(accomplishment.text.length)
+            if (
+              moment(accomplishment.date).format('YYYY-MM-DD') === day.date
+              && accomplishment.user.toString() == user.id.toString()
+              && accomplishment.text.length > 2
+            ) {
+              console.log("YES!!!!!!!!!")
+              usersArr[userIndex].data[dayIndex].text = true;
+            }
+          })
+
+
+          // see if text exists in the database for this user for this day
+          // let accomplishment = await Accomplishment.findOne({
+          //   user: user.id,
+          //   date: day.date
+          // });
+
+          // if (accomplishment !== null && accomplishment.text.length > 2) {
+          //   // set text to true
+          //   usersArr[userIndex].data[dayIndex].text = true;
+          // }
         });
       }
     });
