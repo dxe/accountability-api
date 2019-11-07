@@ -192,7 +192,6 @@ router.get("/dashboard", async (req, res) => {
               && accomplishment.user.toString() == user.id.toString()
               && accomplishment.text.length > 2
             ) {
-              console.log("YES!!!!!!!!!")
               usersArr[userIndex].data[dayIndex].text = true;
             }
           })

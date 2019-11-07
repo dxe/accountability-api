@@ -16,6 +16,11 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
+  backgroundColor: {
+    type: String,
+    required: true,
+    default: "#5900b3"
+  },
   lastLoginDate: {
     type: Date
   }

@@ -55,13 +55,13 @@ router.patch("/:id", middleware.checkToken, getUser, async (req, res) => {
   if (req.body.firstName != null) res.user.firstName = req.body.firstName;
   if (req.body.lastName != null) res.user.lastName = req.body.lastName;
   if (req.body.email != null) res.user.email = req.body.email;
-  if (req.body.lastLoginDate != null)
-    res.user.lastLoginDate = req.body.lastLoginDate;
+  if (req.body.backgroundColor != null) res.user.backgroundColor = req.body.backgroundColor;
+  if (req.body.lastLoginDate != null) res.user.lastLoginDate = req.body.lastLoginDate;
 
   try {
     // save the updates to the database
     const updatedUser = await res.user.save();
-    res.json(updatedUser);
+    res.status(200).json(updatedUser);
   } catch (err) {
     // 400: something wrong w/ user's input
     res.status(400).json({ message: err.message });
@@ -110,7 +110,7 @@ router.post("/auth", async (req, res) => {
   );
 
   // return token to client
-  res.status(200).json({ token: token });
+  res.status(200).json({ token: token, backgroundColor: user.backgroundColor });
 });
 
 // validate google oauth token - https://developers.google.com/identity/sign-in/web/backend-auth#verify-the-integrity-of-the-id-token
