@@ -8,6 +8,14 @@ const router = express.Router();
 const Accomplishment = require("../models/accomplishment");
 const User = require("../models/user");
 const middleware = require("../middleware");
+const logOptions = {
+        logDirectory:'logs', // NOTE: folder must exist and be writable...
+        fileNamePattern:'accomplishments-<DATE>.log',
+        dateFormat:'YYYY.MM.DD',
+        timestampFormat:'YYYY-MM-DD HH:mm:ss.SSS',
+};
+const log = require('simple-node-logger').createRollingFileLogger( logOptions );
+
 
 function getDateRange(startDate, stopDate, type) {
   let dateArray = [];
@@ -38,7 +46,10 @@ router.get("/", middleware.checkToken, async (req, res) => {
 
   // build filter using optional query params that are provided in url
   let findFilter = {};
-  if (req.query.user) findFilter.user = req.query.user;
+  if (req.query.user) {
+    log.info(req.decoded.userEmail + '  GET /  user:' + req.query.user)
+    findFilter.user = req.query.user;
+  }
   if (req.query.start_date || req.query.end_date) findFilter.date = {};
   if (req.query.start_date)
     findFilter.date.$gte = new Date(req.query.start_date);
@@ -72,6 +83,7 @@ router.get("/", middleware.checkToken, async (req, res) => {
     res.json(sortedAccomplishments);
   } catch (err) {
     // 500: internal server error
+    log.error(req.decoded.userEmail + '  ' + err.message)
     res.status(500).json({ message: err.message });
   }
 });
@@ -84,12 +96,16 @@ router.put("/", middleware.checkToken, async (req, res) => {
     // get existing accomplishment from database
     let accomplishment;
     try {
+      log.info(req.decoded.userEmail + '  PUT /  accomplishment:' + req.body.id + '  text:' + req.body.text)
       accomplishment = await Accomplishment.findById(req.body.id);
       // 404: not found
-      if (accomplishment === null)
+      if (accomplishment === null) {
+        log.error(req.decoded.userEmail + '  INVALID ID')
         return res.status(404).json({ message: "Cannot find accomplishment" });
+      }
     } catch (err) {
       // 500: internal server error
+      log.error(req.decoded.userEmail + '  ' + err.message)
       res.status(500).json({ message: err.message });
     }
     // update the text & lastUpdate of existing accomplishment object
@@ -102,10 +118,12 @@ router.put("/", middleware.checkToken, async (req, res) => {
       res.json(updatedAccomplishment);
     } catch (err) {
       // 400: something wrong w/ user's input
+      log.error(req.decoded.userEmail + '  ' + err.message)
       res.status(400).json({ message: err.message });
     }
   } else {
     // null passed in for ID, so create a new object
+    log.info(req.decoded.userEmail + '  PUT /  accomplishment:null' + '  date:' + req.body.date + '  text:' + req.body.text)
     const accomplishment = new Accomplishment({
       date: req.body.date,
       user: req.body.user,
@@ -117,6 +135,7 @@ router.put("/", middleware.checkToken, async (req, res) => {
       res.status(201).json(newAccomplishment);
     } catch (err) {
       // 400: something wrong w/ user's input
+      log.error(req.decoded.userEmail + '  ' + err.message)
       res.status(400).json({ message: err.message });
     }
   }
@@ -124,6 +143,7 @@ router.put("/", middleware.checkToken, async (req, res) => {
 
 // don't require token for this since not much data is actually given
 router.get("/dashboard", async (req, res) => {
+  log.info('GET /dashboard')
   // build an array of dates that we need
   let dateRange = getDateRange(
     req.query.start_date,

@@ -8,10 +8,18 @@ const middleware = require("../middleware");
 const { OAuth2Client } = require("google-auth-library");
 const client = new OAuth2Client(process.env.GOOGLE_OAUTH_CLIENT);
 let jwt = require("jsonwebtoken");
+const logOptions = {
+        logDirectory:'logs', // NOTE: folder must exist and be writable...
+        fileNamePattern:'users-<DATE>.log',
+        dateFormat:'YYYY.MM.DD',
+        timestampFormat:'YYYY-MM-DD HH:mm:ss.SSS',
+};
+const log = require('simple-node-logger').createRollingFileLogger( logOptions );
 
 // get all users
 router.get("/", middleware.checkToken, async (req, res) => {
   try {
+    log.info(req.decoded.userEmail + '  GET /')
     const users = await User.find().sort({firstName: 1});
     const currentUser = req.decoded.userId;
     const currentUserFirstName = req.decoded.firstName;
@@ -22,12 +30,14 @@ router.get("/", middleware.checkToken, async (req, res) => {
 
   } catch (err) {
     // 500: internal server error
+    log.error(req.decoded.userEmail, + '  GET /  ' + err.message)
     res.status(500).json({ message: err.message });
   }
 });
 
 // get one user
 router.get("/:id", middleware.checkToken, getUser, (req, res) => {
+  log.info(req.decoded.userEmail + '  GET /' + res.user._id)
   // just send full json object
   res.json(res.user);
 });
@@ -51,6 +61,7 @@ router.post("/", middleware.checkToken, async (req, res) => {
 
 // update one user
 router.patch("/:id", middleware.checkToken, getUser, async (req, res) => {
+  log.info(req.decoded.userEmail + '  PATCH /' + res.user._id)
   // only update values that are sent in req body
   if (req.body.firstName != null) res.user.firstName = req.body.firstName;
   if (req.body.lastName != null) res.user.lastName = req.body.lastName;
@@ -63,6 +74,7 @@ router.patch("/:id", middleware.checkToken, getUser, async (req, res) => {
     const updatedUser = await res.user.save();
     res.status(200).json(updatedUser);
   } catch (err) {
+    log.error(req.decoded.userEmail + '  PATCH /' + res.user._id + '  ' + err.message)
     // 400: something wrong w/ user's input
     res.status(400).json({ message: err.message });
   }
@@ -87,12 +99,15 @@ router.post("/auth", async (req, res) => {
   // validate the token & get user's email from google
   userEmail = await validateGoogleTokenAndReturnEmail(req.body.token);
 
-  if (!userEmail)
+  if (!userEmail) {
+    log.warn('Invalid OAuth token')
     return res.status(401).json({ message: "oauth token invalid" });
+  }
 
   // check if user's email exists in database
   const user = await User.findOne({ email: userEmail });
   if (!user) {
+    log.warn(userEmail + '  Login invalid')
     return res.status(401).json({ message: "user not authorized" });
   }
 
@@ -109,7 +124,8 @@ router.post("/auth", async (req, res) => {
     }
   );
 
-  // return token to client
+  // return token & settings to client
+  log.info(userEmail + '  Login valid')
   res.status(200).json({ token: token, backgroundColor: user.backgroundColor });
 });
 
