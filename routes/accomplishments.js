@@ -90,13 +90,14 @@ router.get("/", middleware.checkToken, async (req, res) => {
 
 // create or update one accomplishment
 router.put("/", middleware.checkToken, async (req, res) => {
+  let accomplishment;
+
   if (req.body.id != null) {
     // ID passed in, so update the existing object
 
     // get existing accomplishment from database
-    let accomplishment;
     try {
-      log.info(req.decoded.userEmail + '  PUT /  accomplishment:' + req.body.id + '  text:' + req.body.text)
+      log.info(req.decoded.userEmail + '  PUT /  accomplishment:' + req.body.id + '  UPDATING BY ID  text:' + req.body.text)
       accomplishment = await Accomplishment.findById(req.body.id);
       // 404: not found
       if (accomplishment === null) {
@@ -121,22 +122,44 @@ router.put("/", middleware.checkToken, async (req, res) => {
       log.error(req.decoded.userEmail + '  ' + err.message)
       res.status(400).json({ message: err.message });
     }
+
   } else {
-    // null passed in for ID, so create a new object
-    log.info(req.decoded.userEmail + '  PUT /  accomplishment:null' + '  date:' + req.body.date + '  text:' + req.body.text)
-    const accomplishment = new Accomplishment({
-      date: req.body.date,
-      user: req.body.user,
-      text: req.body.text
-    });
-    try {
-      const newAccomplishment = await accomplishment.save();
-      // 201: successfully created an object
-      res.status(201).json(newAccomplishment);
-    } catch (err) {
-      // 400: something wrong w/ user's input
-      log.error(req.decoded.userEmail + '  ' + err.message)
-      res.status(400).json({ message: err.message });
+
+    // check if accomplishment exists for this user on this date
+    // (this should be unlikely, but does happen from time to time)
+    accomplishment = await Accomplishment.findOne({user: req.body.user, date: req.body.date});
+    if (accomplishment) {
+      // update existing accomplishment
+      accomplishment.text = req.body.text;
+      accomplishment.lastUpdate = Date.now();
+      try {
+        // save the updates to the database
+        log.info(req.decoded.userEmail + '  PUT /  accomplishment:null' + '  UPDATING BY DATE  date:' + req.body.date + '  text:' + req.body.text)
+        const updatedAccomplishment = await accomplishment.save();
+        res.json(updatedAccomplishment);
+      } catch (err) {
+        // 400: something wrong w/ user's input
+        log.error(req.decoded.userEmail + '  ' + err.message)
+        res.status(400).json({ message: err.message });
+      }
+    } else {
+      // no id provided & cannot find accomplishment by date for
+      // this user, so it must be new. let's created it in the db.
+      log.info(req.decoded.userEmail + '  PUT /  accomplishment:null' + '  CREATING NEW  date:' + req.body.date + '  text:' + req.body.text)
+      accomplishment = new Accomplishment({
+        date: req.body.date,
+        user: req.body.user,
+        text: req.body.text
+      });
+      try {
+        const newAccomplishment = await accomplishment.save();
+        // 201: successfully created an object
+        res.status(201).json(newAccomplishment);
+      } catch (err) {
+        // 400: something wrong w/ user's input
+        log.error(req.decoded.userEmail + '  ' + err.message)
+        res.status(400).json({ message: err.message });
+      }
     }
   }
 });
