@@ -9,7 +9,7 @@ const Accomplishment = require("../models/accomplishment");
 const User = require("../models/user");
 const middleware = require("../middleware");
 const logOptions = {
-        logDirectory:'logs', // NOTE: folder must exist and be writable...
+        logDirectory:'/var/log/accountability-api', // NOTE: folder must exist and be writable...
         fileNamePattern:'accomplishments-<DATE>.log',
         dateFormat:'YYYY.MM.DD',
         timestampFormat:'YYYY-MM-DD HH:mm:ss.SSS',

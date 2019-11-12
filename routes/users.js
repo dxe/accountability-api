@@ -9,7 +9,7 @@ const { OAuth2Client } = require("google-auth-library");
 const client = new OAuth2Client(process.env.GOOGLE_OAUTH_CLIENT);
 let jwt = require("jsonwebtoken");
 const logOptions = {
-        logDirectory:'logs', // NOTE: folder must exist and be writable...
+        logDirectory:'/var/log/accountability-api', // NOTE: folder must exist and be writable...
         fileNamePattern:'users-<DATE>.log',
         dateFormat:'YYYY.MM.DD',
         timestampFormat:'YYYY-MM-DD HH:mm:ss.SSS',
