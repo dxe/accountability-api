@@ -5,6 +5,8 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const app = express();
 
+const alerts = require("./services/alerts");
+
 mongoose.connect(process.env.DATABASE_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,

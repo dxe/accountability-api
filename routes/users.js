@@ -9,7 +9,7 @@ const { OAuth2Client } = require("google-auth-library");
 const client = new OAuth2Client(process.env.GOOGLE_OAUTH_CLIENT);
 let jwt = require("jsonwebtoken");
 const logOptions = {
-        logDirectory:'/var/log/accountability-api', // NOTE: folder must exist and be writable...
+        logDirectory:process.env.LOG_DIR, // NOTE: folder must exist and be writable...
         fileNamePattern:'users-<DATE>.log',
         dateFormat:'YYYY.MM.DD',
         timestampFormat:'YYYY-MM-DD HH:mm:ss.SSS',
@@ -37,7 +37,7 @@ router.get("/", middleware.checkToken, async (req, res) => {
 
 // get one user
 router.get("/:id", middleware.checkToken, getUser, (req, res) => {
-  log.info(req.decoded.userEmail + '  GET /' + res.user._id)
+  log.info(req.decoded.userEmail + '  GET /' + res.user._id);
   // just send full json object
   res.json(res.user);
 });
@@ -62,10 +62,19 @@ router.post("/", middleware.checkToken, async (req, res) => {
 // update one user
 router.patch("/:id", middleware.checkToken, getUser, async (req, res) => {
   log.info(req.decoded.userEmail + '  PATCH /' + res.user._id)
+
+  // only allow users to update themselves
+  if (res.user._id != req.decoded.userId) {
+    return res.status(401).json({ message: "You are not permitted to edit any user other than yourself." });
+  }
+
   // only update values that are sent in req body
   if (req.body.firstName != null) res.user.firstName = req.body.firstName;
   if (req.body.lastName != null) res.user.lastName = req.body.lastName;
   if (req.body.email != null) res.user.email = req.body.email;
+  if (req.body.phone != null) res.user.phone = req.body.phone;
+  if (req.body.alert != null) res.user.alert = req.body.alert;
+  if (req.body.alertTime != null) res.user.alertTime = req.body.alertTime;
   if (req.body.backgroundColor != null) res.user.backgroundColor = req.body.backgroundColor;
   if (req.body.lastLoginDate != null) res.user.lastLoginDate = req.body.lastLoginDate;
 

@@ -16,6 +16,19 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
+  phone: {
+    type: String,
+    default: '',
+  },
+  alert: {
+    type: Boolean,
+    required: true,
+    default: false
+  },
+  alertTime: {
+    type: String,
+    default: "21:00"
+  },
   backgroundColor: {
     type: String,
     required: true,
