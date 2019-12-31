@@ -22,8 +22,8 @@ function getDateRange(startDate, stopDate, type) {
   let currentDate = moment(startDate);
   stopDate = moment(stopDate);
   while (currentDate <= stopDate) {
-    // only include weekdays
-    if (currentDate.isoWeekday() !== 6 && currentDate.isoWeekday() !== 7) {
+    // only include weekdays for dashboard
+    if (type === "user" || (currentDate.isoWeekday() !== 6 && currentDate.isoWeekday() !== 7)) {
       dateArray.push({
         date: moment(currentDate).format("YYYY-MM-DD"),
         text: type === "user" ? "" : false
