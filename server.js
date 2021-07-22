@@ -55,4 +55,4 @@ app.use("/users", usersRouter);
 const accomplishmentsRouter = require("./routes/accomplishments");
 app.use("/accomplishments", accomplishmentsRouter);
 
-app.listen(process.env.PORT, () => console.log(`Server started: ${process.env.NODE_ENV} instance ${process.env.NODE_APP_INSTANCE}.`));
+app.listen(process.env.PORT, () => console.log(`Server started: ${process.env.NODE_ENV} instance`));
