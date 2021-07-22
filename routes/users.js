@@ -8,13 +8,7 @@ const middleware = require("../middleware");
 const { OAuth2Client } = require("google-auth-library");
 const client = new OAuth2Client(process.env.GOOGLE_OAUTH_CLIENT);
 let jwt = require("jsonwebtoken");
-const logOptions = {
-        logDirectory:process.env.LOG_DIR, // NOTE: folder must exist and be writable...
-        fileNamePattern:'users-<DATE>.log',
-        dateFormat:'YYYY.MM.DD',
-        timestampFormat:'YYYY-MM-DD HH:mm:ss.SSS',
-};
-const log = require('simple-node-logger').createRollingFileLogger( logOptions );
+const log = require('simple-node-logger').createSimpleLogger();
 
 // get all users
 router.get("/", middleware.checkToken, async (req, res) => {

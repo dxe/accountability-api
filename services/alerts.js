@@ -4,13 +4,7 @@ const moment = require("moment");
 const twilio = require('twilio');
 const Accomplishment = require("../models/accomplishment");
 const User = require("../models/user");
-const logOptions = {
-        logDirectory:process.env.LOG_DIR, // NOTE: folder must exist and be writable...
-        fileNamePattern:'alerts-<DATE>.log',
-        dateFormat:'YYYY.MM.DD',
-        timestampFormat:'YYYY-MM-DD HH:mm:ss.SSS',
-};
-const log = require('simple-node-logger').createRollingFileLogger( logOptions );
+const log = require('simple-node-logger').createSimpleLogger();
 
 // TODO: move to .env
 const accountSid = process.env.TWILIO_SID;

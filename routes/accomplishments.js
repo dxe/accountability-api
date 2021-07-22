@@ -8,13 +8,7 @@ const router = express.Router();
 const Accomplishment = require("../models/accomplishment");
 const User = require("../models/user");
 const middleware = require("../middleware");
-const logOptions = {
-        logDirectory:process.env.LOG_DIR, // NOTE: folder must exist and be writable...
-        fileNamePattern:'accomplishments-<DATE>.log',
-        dateFormat:'YYYY.MM.DD',
-        timestampFormat:'YYYY-MM-DD HH:mm:ss.SSS',
-};
-const log = require('simple-node-logger').createRollingFileLogger( logOptions );
+const log = require('simple-node-logger').createSimpleLogger();
 
 
 function getDateRange(startDate, stopDate, type) {
