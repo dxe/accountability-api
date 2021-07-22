@@ -16,7 +16,7 @@ const mongooseOptions = {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
-    auto_reconnect:true
+    auto_reconnect: true,
 }
 db.on('connecting', function() {
     console.log('connecting to MongoDB...');
