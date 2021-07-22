@@ -11,14 +11,34 @@ if (process.env.SEND_ALERTS === "enabled") {
 	console.log("Alerts enabled.")
 }
 
-mongoose.connect(process.env.DATABASE_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useCreateIndex: true
-});
 const db = mongoose.connection;
-db.on("error", err => console.error(err));
-db.once("open", () => console.log("Connected to database"));
+const mongooseOptions = {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+    auto_reconnect:true
+}
+db.on('connecting', function() {
+    console.log('connecting to MongoDB...');
+});
+db.on('error', function(error) {
+    console.error('Error in MongoDb connection: ' + error);
+    mongoose.disconnect();
+});
+db.on('connected', function() {
+    console.log('MongoDB connected!');
+});
+db.once('open', function() {
+    console.log('MongoDB connection opened!');
+});
+db.on('reconnected', function () {
+    console.log('MongoDB reconnected!');
+});
+db.on('disconnected', function() {
+    console.log('MongoDB disconnected!');
+    mongoose.connect(process.env.DATABASE_URL, mongooseOptions);
+});
+mongoose.connect(process.env.DATABASE_URL, mongooseOptions);
 
 app.use(express.json());
 app.use(
