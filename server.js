@@ -25,6 +25,10 @@ app.use(
   cors()
 );
 
+app.get("/healthz", (req, res) => {
+    res.status(200)
+})
+
 const usersRouter = require("./routes/users");
 app.use("/users", usersRouter);
 
