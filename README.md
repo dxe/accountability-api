@@ -17,3 +17,6 @@ API used by the Stakeholders Accountability web app.
     ```
     
 4. ```npm start``` or ```npm devStart```
+
+# Deploying changes
+Changes pushed to master are automatically deployed.
