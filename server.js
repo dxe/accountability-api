@@ -6,8 +6,9 @@ const mongoose = require("mongoose");
 const app = express();
 
 // only run alerts service on "instance 0" when in prod
-if (process.env.NODE_APP_INSTANCE == 0 ||  process.env.NODE_ENV === "development") {
+if (process.env.SEND_ALERTS === "enabled") {
 	const alerts = require("./services/alerts");
+	console.log("Alerts enabled.")
 }
 
 mongoose.connect(process.env.DATABASE_URL, {
