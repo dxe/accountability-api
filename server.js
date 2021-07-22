@@ -26,7 +26,7 @@ app.use(
 );
 
 app.get("/healthz", (req, res) => {
-    res.status(200)
+    res.status(200).send("OK")
 })
 
 const usersRouter = require("./routes/users");
