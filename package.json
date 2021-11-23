@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "devStart": "nodemon server.js",
-    "start": "pm2 start server.js -i 0 --name \"accountability api\" --watch"
+    "start": "nodemon server.js"
   },
   "author": "",
   "license": "ISC",
