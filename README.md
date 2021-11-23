@@ -7,6 +7,8 @@ API used by the Stakeholders Accountability web app.
 
     ```
     PORT=XXXX
+    NODE_ENV=development
+    DEV_EMAIL=X@X.COM
     DATABASE_URL=XXXX
     SECRET=XXXX
     GOOGLE_OAUTH_CLIENT=XXXX

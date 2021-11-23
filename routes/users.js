@@ -100,7 +100,7 @@ router.post("/auth", async (req, res) => {
     return res.status(400).json({ message: "token not supplied" });
 
   // validate the token & get user's email from google
-  userEmail = await validateGoogleTokenAndReturnEmail(req.body.token);
+  const userEmail = process.env.NODE_ENV === "development" ? process.env.DEV_EMAIL : await validateGoogleTokenAndReturnEmail(req.body.token);
 
   if (!userEmail) {
     log.warn('Invalid OAuth token')
