@@ -57,10 +57,11 @@ router.post("/", middleware.checkToken, async (req, res) => {
 router.patch("/:id", middleware.checkToken, getUser, async (req, res) => {
   log.info(req.decoded.userEmail + '  PATCH /' + res.user._id)
 
+  // TODO: create an admin role instead of allowing all users to modify other users
   // only allow users to update themselves
-  if (res.user._id != req.decoded.userId) {
-    return res.status(401).json({ message: "You are not permitted to edit any user other than yourself." });
-  }
+  // if (res.user._id != req.decoded.userId) {
+  //   return res.status(401).json({ message: "You are not permitted to edit any user other than yourself." });
+  // }
 
   // only update values that are sent in req body
   if (req.body.firstName != null) res.user.firstName = req.body.firstName;
@@ -99,7 +100,7 @@ router.post("/auth", async (req, res) => {
   if (!req.body.token)
     return res.status(400).json({ message: "token not supplied" });
 
-  // validate the token & get user's email from google
+  // validate the token & get user's email from google (or bypass auth if dev)
   const userEmail = process.env.NODE_ENV === "development" ? process.env.DEV_EMAIL : await validateGoogleTokenAndReturnEmail(req.body.token);
 
   if (!userEmail) {
